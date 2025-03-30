@@ -1,0 +1,16 @@
+{% extends "admin/layout.twig" %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
+    
+    <div class="grid grid-cols-3 gap-4">
+        <div class="bg-blue-500 text-white p-4 rounded">
+            <h3 class="text-lg">Users</h3>
+            <p class="text-2xl">{{ users_count ?? 0 }}</p>
+        </div>
+        
+        <!-- Add more stats widgets -->
+    </div>
+</div>
+{% endblock %}
