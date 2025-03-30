@@ -1,78 +1,113 @@
-# Slim Framework Admin Panel
+# Slim4 Admin Panel
 
-Modern admin panel built with Slim Framework 4, Twig templates, and Tailwind CSS.
+Moderný administračný panel vytvorený pomocou Slim Framework 4, Twig šablón a Tailwind CSS.
 
-## Requirements
+## Použité technológie
 
-- PHP 8.1 or newer
-- Composer
+- PHP 8.1+
+- Slim Framework 4
+- Twig šablóny
+- Tailwind CSS
 - MySQL/MariaDB
+- PHP-DI (Dependency Injection)
 
-## Installation
+## Funkcie
 
-1. Clone the repository
+- [x] Moderné admin rozhranie s Tailwind CSS
+- [x] PSR-4 autoloading
+- [x] Dependency Injection s PHP-DI
+- [x] Twig šablónovací systém
+- [x] Admin autentifikácia
+- [x] Responzívny dizajn
+- [ ] Správa používateľov
+- [ ] Správa rolí a oprávnení
+- [ ] Správa médií
+- [ ] Správa nastavení
+- [ ] Protokol aktivít
+
+## Inštalácia
+
+1. Naklonovanie repozitára
 ```bash
-git clone [your-repo-url]
-cd [your-project-name]
+git clone https://github.com/evan70/Slim4.git
+cd Slim4
 ```
 
-2. Install dependencies
+2. Inštalácia závislostí
 ```bash
 composer install
 ```
 
-3. Copy `.env.example` to `.env` and configure your environment
+3. Vytvorenie konfiguračného súboru
 ```bash
 cp .env.example .env
 ```
 
-4. Set up your database and update `.env` with credentials
+4. Nastavenie databázy
+   
+   Pre SQLite:
+   ```bash
+   # Vytvorenie SQLite databázy
+   php bin/init-sqlite.php
+   
+   # Upravte .env na použitie SQLite
+   DB_CONNECTION=sqlite
+   DB_DATABASE=database/database.sqlite
+   ```
+   
+   Pre MySQL:
+   ```bash
+   # Upravte .env podľa vašej MySQL konfigurácie
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=slim4_admin
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-5. Run database migrations
-```bash
-php vendor/bin/phinx migrate
-```
-
-## Project Structure
-
-```
-├── public/             # Public directory (web root)
-├── routes/             # Route definitions
-│   ├── web.php
-│   └── admin.php
-├── src/                # Application source code
-│   ├── Admin/         # Admin-related code
-│   ├── Controllers/   # Controllers
-│   ├── Models/        # Database models
-│   └── Middleware/    # Middleware classes
-├── templates/          # Twig templates
-│   └── admin/         # Admin templates
-└── vendor/            # Composer dependencies
-```
-
-## Features
-
-- [x] Modern admin interface with Tailwind CSS
-- [x] Authentication system
-- [x] Dashboard
-- [x] Responsive sidebar navigation
-- [ ] User management
-- [ ] Role-based access control
-- [ ] Media management
-- [ ] Settings management
-- [ ] Activity logs
-
-## Development
-
-To start the development server:
+5. Spustenie vývojového servera
 ```bash
 php -S localhost:8080 -t public
 ```
 
-## Contributing
+## Štruktúra projektu
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+```
+├── public/             # Verejný adresár
+│   ├── index.php      # Vstupný bod aplikácie
+│   └── .htaccess      # Apache konfigurácia
+├── routes/             # Definície ciest
+│   ├── web.php        # Verejné cesty
+│   └── admin.php      # Admin cesty
+├── src/                # Zdrojový kód
+│   ├── Admin/         # Admin funkcionalita
+│   │   ├── Controllers/
+│   │   └── Middleware/
+│   ├── Controllers/   # Kontroléry
+│   ├── Models/        # Databázové modely
+│   └── Middleware/    # Middleware
+├── templates/          # Twig šablóny
+│   └── admin/         # Admin šablóny
+└── vendor/            # Composer závislosti
+```
+
+## Vývoj
+
+Projekt používa:
+- PSR-4 štandard pre autoloading
+- PSR-7 pre HTTP správy
+- PSR-11 pre kontajner
+- PSR-15 pre HTTP middleware
+
+## Prispievanie
+
+1. Vytvorte fork repozitára
+2. Vytvorte feature branch (`git checkout -b feature/nova-funkcia`)
+3. Commitnite zmeny (`git commit -m 'Pridaná nová funkcia'`)
+4. Pushnite do branchu (`git push origin feature/nova-funkcia`)
+5. Vytvorte Pull Request
+
+## Licencia
+
+Tento projekt je vydaný pod MIT licenciou - pozrite súbor LICENSE pre detaily

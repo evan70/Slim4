@@ -7,6 +7,10 @@
 .env.*
 !.env.example
 
+# Database
+/database/*.sqlite
+/database/*.sqlite-journal
+
 # IDE
 .idea/
 .vscode/
