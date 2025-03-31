@@ -1,9 +1,11 @@
 <?php
 
 use App\Admin\Controllers\AdminController;
-use App\Admin\Middleware\AdminAuthMiddleware;
+use App\Admin\Controllers\TwoFactorAuthController;
+use App\Admin\Controllers\AuditLogController;
+use App\Admin\Controllers\IpWhitelistController;
 
-$app->group('/dashboard', function ($group) {
+$app->group('/dashboard', function ($group) use ($app) {
     // Public routes
     $group->get('/login', [AdminController::class, 'login'])->setName('admin.login');
     $group->post('/login', [AdminController::class, 'login']);
@@ -32,5 +34,20 @@ $app->group('/dashboard', function ($group) {
             ->setName('admin.settings');
         $group->post('/settings', [AdminController::class, 'settings'])
             ->setName('admin.settings.update');
-    })->add(new AdminAuthMiddleware());
+    })->add($app->getContainer()->get('admin_auth_middleware'));
 });
+
+// 2FA Routes
+$app->get('/admin/2fa/setup', [TwoFactorAuthController::class, 'setup']);
+$app->post('/admin/2fa/enable', [TwoFactorAuthController::class, 'enable']);
+$app->post('/admin/2fa/verify', [TwoFactorAuthController::class, 'verify']);
+$app->post('/admin/2fa/disable', [TwoFactorAuthController::class, 'disable']);
+
+// Audit Log Routes
+$app->get('/admin/audit', [AuditLogController::class, 'index']);
+$app->get('/admin/audit/{id}', [AuditLogController::class, 'show']);
+
+// IP Whitelist Routes
+$app->get('/admin/security/ip-whitelist', [IpWhitelistController::class, 'index']);
+$app->post('/admin/security/ip-whitelist', [IpWhitelistController::class, 'store']);
+$app->delete('/admin/security/ip-whitelist/{id}', [IpWhitelistController::class, 'delete']);

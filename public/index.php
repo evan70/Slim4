@@ -1,19 +1,5 @@
 <?php
 
-// Error handling
-set_error_handler(function ($severity, $message, $file, $line) {
-    if (error_reporting() & $severity) {
-        throw new ErrorException($message, 0, $severity, $file, $line);
-    }
-});
-
-set_exception_handler(function ($e) {
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Error: " . $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
-    echo $e->getTraceAsString();
-});
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -22,6 +8,9 @@ use DI\Container;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Twig\Loader\FilesystemLoader;
+use App\Admin\Middleware\AdminAuthMiddleware;
+use App\Services\TwoFactorAuthService;
+use App\Services\SessionManagementService;
 
 session_start();
 
@@ -31,7 +20,24 @@ require __DIR__ . '/../src/bootstrap.php';
 // Create Container
 $container = new Container();
 
-// Create App first
+// Configure services
+$container->set(TwoFactorAuthService::class, function (Container $container) {
+    return new TwoFactorAuthService();
+});
+
+$container->set(SessionManagementService::class, function (Container $container) {
+    return new SessionManagementService();
+});
+
+// Configure AdminAuthMiddleware
+$container->set('admin_auth_middleware', function (Container $container) {
+    return new AdminAuthMiddleware(
+        $container->get(TwoFactorAuthService::class),
+        $container->get(SessionManagementService::class)
+    );
+});
+
+// Create App
 $app = AppFactory::createFromContainer($container);
 
 // Configure Twig

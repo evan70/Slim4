@@ -2,38 +2,41 @@
 
 namespace App\Admin\Middleware;
 
+use App\Services\TwoFactorAuthService;
+use App\Services\SessionManagementService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response;
 
 class AdminAuthMiddleware
 {
-    private const MAX_LOGIN_ATTEMPTS = 5;
-    private const LOCKOUT_TIME = 1800; // 30 minút
+    private $twoFactorAuth;
+    private $sessionManager;
+
+    public function __construct(
+        TwoFactorAuthService $twoFactorAuth,
+        SessionManagementService $sessionManager
+    ) {
+        $this->twoFactorAuth = $twoFactorAuth;
+        $this->sessionManager = $sessionManager;
+    }
 
     public function __invoke(Request $request, RequestHandler $handler)
     {
         $session = $_SESSION['admin'] ?? null;
-        $ip = $request->getServerParams()['REMOTE_ADDR'];
         
-        // Kontrola IP blacklistu
-        if ($this->isIpBlacklisted($ip)) {
-            return $this->createErrorResponse('Too many login attempts. Try again later.', 429);
-        }
-
-        // Kontrola 2FA ak je nastavené
-        if ($session && !$this->verifyTwoFactor($session)) {
-            return $this->redirectToTwoFactor();
-        }
-
-        // Základná autentifikácia
         if (!$session && !$this->isLoginPage($request)) {
             return $this->createRedirectResponse('/dashboard/login');
         }
 
-        // Rate limiting
-        if ($this->isRateLimitExceeded($ip)) {
-            return $this->createErrorResponse('Rate limit exceeded', 429);
+        if ($session) {
+            // Update session activity
+            $this->sessionManager->updateActivity();
+
+            // Check 2FA if enabled
+            if (!$this->verifyTwoFactor($session)) {
+                return $this->redirectToTwoFactor();
+            }
         }
 
         return $handler->handle($request);

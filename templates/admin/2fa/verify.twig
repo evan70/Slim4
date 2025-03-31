@@ -1,0 +1,67 @@
+{% extends "admin/layout.twig" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Dvojfaktorové overenie
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Zadajte kód z vašej autentifikačnej aplikácie
+            </p>
+        </div>
+        
+        <form id="verify2faForm" class="mt-8 space-y-6">
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="code" class="sr-only">Verifikačný kód</label>
+                    <input id="code" name="code" type="text" required 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                           placeholder="000000">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit"
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Overiť
+                </button>
+            </div>
+
+            <div class="text-sm text-center">
+                <a href="/admin/2fa/recovery" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    Použiť záložný kód
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('verify2faForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    try {
+        const response = await fetch('/admin/2fa/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Object.fromEntries(formData))
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = '/admin/dashboard';
+        } else {
+            alert(data.error || 'Neplatný verifikačný kód');
+        }
+    } catch (error) {
+        alert('Nastala chyba pri komunikácii so serverom');
+    }
+});
+</script>
+{% endblock %}

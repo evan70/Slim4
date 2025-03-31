@@ -1,0 +1,115 @@
+{% extends "admin/layout.twig" %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">IP Whitelist</h1>
+            <p class="mt-2 text-sm text-gray-700">Správa povolených IP adries pre prístup do admin rozhrania.</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button type="button" onclick="showAddForm()" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
+                Pridať IP adresu
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-8 flex flex-col">
+        <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-300">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">IP Adresa</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Popis</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Platnosť do</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Vytvoril</th>
+                                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                    <span class="sr-only">Akcie</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            {% for ip in ips %}
+                            <tr>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ ip.ip_address }}</td>
+                                <td class="px-3 py-4 text-sm text-gray-500">{{ ip.description }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    {{ ip.expires_at ? ip.expires_at|date('d.m.Y') : 'Neobmedzene' }}
+                                </td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    {{ ip.creator.name }}
+                                </td>
+                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    <form method="POST" action="/admin/security/ip-whitelist/{{ ip.id }}" class="inline">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="text-red-600 hover:text-red-900">Odstrániť</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pre pridanie IP adresy -->
+<div id="addIpModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+    <div class="bg-white rounded-lg px-4 pt-5 pb-4 overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+        <form method="POST" action="/admin/security/ip-whitelist">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="ip_address">
+                    IP Adresa
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                       id="ip_address" 
+                       name="ip_address" 
+                       type="text" 
+                       required 
+                       pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                    Popis
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                       id="description" 
+                       name="description" 
+                       type="text" 
+                       required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="expires_at">
+                    Platnosť do (voliteľné)
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                       id="expires_at" 
+                       name="expires_at" 
+                       type="date">
+            </div>
+            <div class="flex items-center justify-end">
+                <button type="button" onclick="hideAddForm()" class="mr-3 text-gray-600 hover:text-gray-800">
+                    Zrušiť
+                </button>
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    Pridať
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showAddForm() {
+    document.getElementById('addIpModal').classList.remove('hidden');
+}
+
+function hideAddForm() {
+    document.getElementById('addIpModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

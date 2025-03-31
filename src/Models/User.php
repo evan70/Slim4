@@ -29,4 +29,14 @@ class User extends Model
     {
         return $this->is_admin;
     }
+
+    public function twoFactorAuth()
+    {
+        return $this->hasOne(TwoFactorAuth::class);
+    }
+
+    public function has2faEnabled(): bool
+    {
+        return $this->twoFactorAuth && $this->twoFactorAuth->is_enabled;
+    }
 }

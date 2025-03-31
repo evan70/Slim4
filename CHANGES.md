@@ -3,31 +3,67 @@
 Všetky významné zmeny v projekte sú dokumentované v tomto súbore.
 Formát je založený na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Planned] - Budúce vylepšenia
+
+### API & Performance
+- [ ] REST API endpoints
+- [ ] GraphQL podpora
+- [ ] WebSocket real-time notifikácie
+- [ ] Cache systém
+- [ ] API dokumentácia
+- [ ] Rate limiting
+
+### Security
+- [x] 2FA autentifikácia
+- [ ] OAuth2 integrácia
+- [ ] Audit logging
+- [x] Session management
+- [ ] IP whitelisting
+- [ ] Security monitoring
+
+### UI/UX
+- [ ] Dark/Light mode
+- [ ] Drag & drop rozhranie
+- [ ] Live preview
+- [ ] Customizovateľný dashboard
+- [ ] Dátové vizualizácie
+- [ ] Bulk akcie
+
+### Management
+- [ ] RBAC systém
+- [ ] Media management
+- [ ] Backup systém
+- [ ] Import/Export funkcionalita
+- [ ] Email notifikácie
+- [ ] Task management
+
 ## [Unreleased]
 
 ### Added
-- Základná štruktúra admin panelu
-- Integrácia Slim 4 frameworku
-- Implementácia Twig šablón
-- Tailwind CSS pre štýlovanie
-- PSR-4 autoloading
-- Dependency Injection s PHP-DI
-- Základná autentifikácia admin používateľov
-- Migračný systém pre databázu
-- Responzívny dizajn admin rozhrania
+- Implementácia Two-Factor Authentication (2FA)
+  - Generovanie a overovanie 2FA kódov
+  - QR kódy pre jednoduché nastavenie
+  - Systém záložných kódov pre prípad straty zariadenia
+  - Možnosť vypnutia 2FA
+- Vylepšený systém správy sessions
+  - Automatické ukončenie neaktívnych sessions
+  - Pravidelná regenerácia session ID
+  - Sledovanie aktivity užívateľa
+  - Konfigurovateľná životnosť session
+- Nové závislosti
+  - Pridaný balík pragmarx/google2fa pre 2FA funkcionalitu
 
 ### Changed
-- Aktualizácia na PHP 8.1+
-- Prechod na Eloquent ORM
-- Vylepšená štruktúra routes s použitím skupín
-- Optimalizácia middleware systému
+- Reorganizácia admin routes do logických skupín
+- Vylepšenie štruktúry kontrolérov
+- Optimalizácia autentifikačného systému
 
 ### Security
-- Implementácia admin autentifikácie
-- Zabezpečenie admin routes pomocou middleware
-- Validácia formulárových vstupov
-- Ochrana proti CSRF útokom
-- Bezpečné spracovanie hesiel
+- Zabezpečenie routes pre správu používateľov
+- Implementácia autorizácie pre admin akcie
+- Validácia používateľských vstupov
+- Vylepšené zabezpečenie sessions
+- Pridaná druhá úroveň autentifikácie (2FA)
 
 ## [0.1.0] - 2024-01-15
 
@@ -41,8 +77,15 @@ Formát je založený na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
 - Migračný systém
 - Docker konfigurácia
 - CI/CD pipeline
+- Základná štruktúra admin panelu
+- Integrácia Slim 4 frameworku
+- Implementácia Twig šablón
+- Tailwind CSS pre štýlovanie
+- PSR-4 autoloading
+- Dependency Injection s PHP-DI
 
 ### Security
 - Základné bezpečnostné nastavenia
 - Konfigurácia .htaccess
 - Ochrana citlivých súborov
+- Základná admin autentifikácia
