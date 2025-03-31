@@ -21,22 +21,11 @@ Moderný administračný panel vytvorený pomocou Slim Framework 4, Twig šabló
 - [x] Admin autentifikácia
 - [x] Responzívny dizajn
 - [x] Migračný systém
-- [x] Dark/Light mode s perzistenciou
 - [ ] Správa používateľov
 - [ ] Správa rolí a oprávnení
 - [ ] Správa médií
 - [ ] Správa nastavení
 - [ ] Protokol aktivít
-
-## UI/UX Funkcie
-
-### Dark Mode
-Aplikácia podporuje prepínanie medzi svetlým a tmavým režimom:
-- Prepínač v hlavnej navigácii
-- Automatická detekcia systémových preferencií
-- Ukladanie nastavení do localStorage
-- Plynulé prechody medzi režimami
-- Optimalizované tmavé varianty všetkých komponentov
 
 ## Inštalácia
 

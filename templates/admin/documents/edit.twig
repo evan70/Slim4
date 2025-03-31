@@ -1,0 +1,107 @@
+
+{% extends "admin/layouts/base.twig" %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <form id="documentForm" method="POST" action="{{ url_for('admin.documents.store') }}" class="space-y-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">{{ document ? 'Edit Document' : 'Create Document' }}</h1>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Save Document
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Filename</label>
+                <input type="text" name="filename" 
+                       value="{{ document.filename|default('') }}"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                       {% if document %}readonly{% endif %}>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Content (Markdown)</label>
+                    <textarea name="content" 
+                              id="markdown-content"
+                              rows="20"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ document.raw_content|default('') }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Preview</label>
+                    <div id="preview" class="mt-1 p-4 border rounded-md prose max-w-none">
+                        {{ document.content|raw|default('') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('documentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {
+        filename: formData.get('filename'),
+        content: formData.get('content')
+    };
+
+    try {
+        const response = await fetch('{{ url_for("admin.documents.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            if (result.redirect) {
+                window.location.href = result.redirect;
+            } else {
+                window.location.href = '/admin/documents';
+            }
+        } else {
+            alert(result.error || 'Failed to save document');
+        }
+    } catch (error) {
+        console.error('Save error:', error);
+        alert('An error occurred while saving the document');
+    }
+});
+
+document.getElementById('markdown-content').addEventListener('input', debounce(function(e) {
+    fetch('{{ url_for("admin.documents.preview") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: e.target.value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('preview').innerHTML = data.html;
+    });
+}, 300));
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+</script>
+{% endblock %}

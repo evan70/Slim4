@@ -4,6 +4,7 @@ use App\Admin\Controllers\AdminController;
 use App\Admin\Controllers\TwoFactorAuthController;
 use App\Admin\Controllers\AuditLogController;
 use App\Admin\Controllers\IpWhitelistController;
+use App\Admin\Controllers\DocumentController;
 
 $app->group('/dashboard', function ($group) use ($app) {
     // Public routes
@@ -51,3 +52,17 @@ $app->get('/admin/audit/{id}', [AuditLogController::class, 'show']);
 $app->get('/admin/security/ip-whitelist', [IpWhitelistController::class, 'index']);
 $app->post('/admin/security/ip-whitelist', [IpWhitelistController::class, 'store']);
 $app->delete('/admin/security/ip-whitelist/{id}', [IpWhitelistController::class, 'delete']);
+
+// Documents routes
+$app->group('/admin/documents', function ($group) {
+    $group->get('', [DocumentController::class, 'index'])
+        ->setName('admin.documents');
+    $group->get('/create', [DocumentController::class, 'create'])
+        ->setName('admin.documents.create');
+    $group->post('', [DocumentController::class, 'store'])
+        ->setName('admin.documents.store');
+    $group->get('/{filename}', [DocumentController::class, 'edit'])
+        ->setName('admin.documents.edit');
+    $group->post('/preview', [DocumentController::class, 'preview'])
+        ->setName('admin.documents.preview');
+})->add($app->getContainer()->get('admin_auth_middleware'));

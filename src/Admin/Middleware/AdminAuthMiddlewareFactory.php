@@ -6,6 +6,8 @@ use DI\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\App;
+use App\Services\TwoFactorAuthService;
+use App\Services\SessionManagementService;
 
 class AdminAuthMiddlewareFactory
 {

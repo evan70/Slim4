@@ -6,10 +6,8 @@ use Slim\App;
 
 /** @var App $app */
 
-$app->get('/', function (Request $request, Response $response) {
-    $response->getBody()->write('Hello World!');
-    return $response;
-});
+$app->get('/', \App\Controllers\HomeController::class . ':index')
+    ->setName('home');
 
 $app->get('/api/users', function (Request $request, Response $response) {
     $data = ['users' => ['John', 'Jane']];
@@ -17,3 +15,10 @@ $app->get('/api/users', function (Request $request, Response $response) {
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');
 });
+
+// Document routes
+$app->get('/documents', \App\Controllers\DocumentController::class . ':index')
+    ->setName('documents.index');
+
+$app->get('/documents/{filename}', \App\Controllers\DocumentController::class . ':show')
+    ->setName('documents.show');

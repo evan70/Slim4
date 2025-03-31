@@ -1,0 +1,24 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{{ url_for('documents.index') }}" 
+           class="text-blue-600 hover:text-blue-800">
+            &larr; Back to Documents
+        </a>
+    </div>
+
+    <article class="prose lg:prose-xl max-w-none bg-white rounded-lg shadow p-8">
+        <h1>{{ document.title }}</h1>
+        
+        <div class="markdown-content">
+            {{ document.content|raw }}
+        </div>
+    </article>
+</div>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.x/dist/typography.min.css">
+{% endblock %}

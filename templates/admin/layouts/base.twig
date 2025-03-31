@@ -56,6 +56,11 @@
                     <i class="fas fa-sign-out-alt sidebar-icon"></i>
                     Logout
                 </a>
+                <a href="{{ url_for('admin.documents') }}"
+                   class="sidebar-link {{ is_current_url('admin.documents') ? 'active' : '' }}">
+                    <i class="fas fa-file-alt sidebar-icon"></i>
+                    Documents
+                </a>
             </nav>
         </div>
 

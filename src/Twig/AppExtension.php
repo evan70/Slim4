@@ -18,21 +18,29 @@ class AppExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('is_current_path', [$this, 'isCurrentPath'])
+            new TwigFunction('is_current_url', [$this, 'isCurrentUrl'])
         ];
     }
 
-    public function isCurrentPath(string $routeName): bool
+    public function isCurrentUrl(string $routeName): bool
     {
         $route = $this->app->getRouteCollector()->getNamedRoute($routeName);
-        $routePath = $route->getPattern();
+        $pattern = $route->getPattern();
         
-        $currentPath = $_SERVER['REQUEST_URI'];
-        // Remove query string if any
+        $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
+        
+        // Remove query string if present
         if (($pos = strpos($currentPath, '?')) !== false) {
             $currentPath = substr($currentPath, 0, $pos);
         }
         
-        return $currentPath === $routePath;
+        // For exact match
+        if ($pattern === $currentPath) {
+            return true;
+        }
+        
+        // For pattern match (e.g., /documents/{filename})
+        $pattern = preg_replace('/\{[^}]+\}/', '[^/]+', $pattern);
+        return (bool) preg_match('#^' . $pattern . '$#', $currentPath);
     }
 }
