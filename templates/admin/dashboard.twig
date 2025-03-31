@@ -1,16 +1,80 @@
-{% extends "admin/layout.twig" %}
+{% extends "admin/layouts/base.twig" %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow p-6">
-    <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
-    
-    <div class="grid grid-cols-3 gap-4">
-        <div class="bg-blue-500 text-white p-4 rounded">
-            <h3 class="text-lg">Users</h3>
-            <p class="text-2xl">{{ users_count ?? 0 }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- Stats Cards -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-500">
+                    <i class="heroicons-outline-users text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-gray-500 text-sm">Total Users</p>
+                    <p class="text-2xl font-semibold">{{ stats.users ?? 0 }}</p>
+                </div>
+            </div>
         </div>
-        
-        <!-- Add more stats widgets -->
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-500">
+                    <i class="heroicons-outline-document-text text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-gray-500 text-sm">Total Posts</p>
+                    <p class="text-2xl font-semibold">{{ stats.posts ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-500">
+                    <i class="heroicons-outline-chat-bubble-left-right text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-gray-500 text-sm">Comments</p>
+                    <p class="text-2xl font-semibold">{{ stats.comments ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-500">
+                    <i class="heroicons-outline-star text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-gray-500 text-sm">Reviews</p>
+                    <p class="text-2xl font-semibold">{{ stats.reviews ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold">Recent Activity</h3>
+        </div>
+        <div class="p-6">
+            {% if activities is empty %}
+                <p class="text-gray-500 text-center py-4">No recent activity</p>
+            {% else %}
+                <div class="space-y-4">
+                    {% for activity in activities %}
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="heroicons-outline-{{ activity.icon ?? 'bell' }} text-gray-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium">{{ activity.description }}</p>
+                                <p class="text-xs text-gray-500">{{ activity.created_at|date('Y-m-d H:i') }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

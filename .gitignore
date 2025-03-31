@@ -31,7 +31,9 @@ Thumbs.db
 # Build artifacts
 /public/build/
 /public/uploads/
-/public/assets/
+
+# Exclude assets directory from ignore
+!/public/assets/
 
 # Testing
 /phpunit.xml

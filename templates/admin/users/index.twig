@@ -1,0 +1,67 @@
+{% extends "admin/layout.twig" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Users Management</h1>
+        <a href="{{ url_for('admin.users.create') }}" 
+           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Add New User
+        </a>
+    </div>
+
+    <div class="bg-white shadow-md rounded my-6">
+        <table class="min-w-full">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="py-3 px-6 text-left">Name</th>
+                    <th class="py-3 px-6 text-left">Email</th>
+                    <th class="py-3 px-6 text-center">Admin</th>
+                    <th class="py-3 px-6 text-center">Verified</th>
+                    <th class="py-3 px-6 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-4 px-6">{{ user.name }}</td>
+                    <td class="py-4 px-6">{{ user.email }}</td>
+                    <td class="py-4 px-6 text-center">
+                        {% if user.is_admin %}
+                            <span class="text-green-600">✓</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        {% if user.email_verified_at %}
+                            <span class="text-green-600">✓</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <a href="{{ url_for('admin.users.edit', {'id': user.id}) }}" 
+                           class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
+                        <a href="{{ url_for('admin.users.delete', {'id': user.id}) }}" 
+                           class="text-red-600 hover:text-red-900"
+                           onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Pagination #}
+    <div class="mt-4">
+        {% if users.hasPages() %}
+            <div class="flex justify-center space-x-4">
+                {% if users.previousPageUrl() %}
+                    <a href="{{ users.previousPageUrl() }}" class="px-4 py-2 bg-gray-200 rounded">Previous</a>
+                {% endif %}
+                
+                {% if users.nextPageUrl() %}
+                    <a href="{{ users.nextPageUrl() }}" class="px-4 py-2 bg-gray-200 rounded">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

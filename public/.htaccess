@@ -1,4 +1,16 @@
 RewriteEngine On
+
+# Redirect root favicon.ico request to the correct location
+RewriteRule ^favicon\.ico$ /assets/favicon/favicon.ico [L]
+
+# Allow direct access to assets directory
+RewriteCond %{REQUEST_URI} !^/assets/
+# Allow direct access to existing files
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
+
+# Proper MIME types for favicon
+AddType image/x-icon .ico
+AddType image/png .png
+AddType application/json .webmanifest

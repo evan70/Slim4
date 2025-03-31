@@ -1,0 +1,51 @@
+{% extends "admin/layouts/base.twig" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">System Settings</h2>
+        
+        <form method="POST" action="{{ url_for('admin.settings') }}" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Site Name</label>
+                <input type="text" 
+                       name="site_name" 
+                       value="{{ settings.site_name|default('') }}"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Admin Email</label>
+                <input type="email" 
+                       name="admin_email" 
+                       value="{{ settings.admin_email|default('') }}"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Items Per Page</label>
+                <input type="number" 
+                       name="items_per_page" 
+                       value="{{ settings.items_per_page|default('10') }}"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Maintenance Mode</label>
+                <select name="maintenance_mode" 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="0" {{ settings.maintenance_mode == '0' ? 'selected' : '' }}>Off</option>
+                    <option value="1" {{ settings.maintenance_mode == '1' ? 'selected' : '' }}>On</option>
+                </select>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" 
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
