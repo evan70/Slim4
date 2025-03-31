@@ -4,80 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - {{ title }}</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/favicon/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/assets/favicon/site.webmanifest">
-    
-    <!-- Styles -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Základné štýly pre admin panel */
         .sidebar-link {
-            @apply flex items-center px-6 py-2 text-gray-300 hover:bg-gray-700 hover:text-white;
+            @apply flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200;
         }
         .sidebar-link.active {
             @apply bg-gray-900 text-white;
         }
         .sidebar-icon {
-            @apply mr-3 text-lg;
+            @apply w-5 h-5 mr-3;
         }
     </style>
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <div class="bg-gray-800 text-white w-64 py-6 flex flex-col">
-            <div class="px-6 mb-8">
-                <h1 class="text-2xl font-bold">Admin Panel</h1>
+        <aside class="bg-gray-800 w-64 flex flex-col fixed h-full">
+            <div class="flex items-center justify-center h-16 bg-gray-900">
+                <span class="text-white text-xl font-semibold">Admin Panel</span>
             </div>
-            <nav class="flex-1">
-                <a href="{{ url_for('admin.dashboard') }}" 
-                   class="sidebar-link {{ is_current_url('admin.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-home sidebar-icon"></i>
-                    Dashboard
-                </a>
-                <a href="{{ url_for('admin.users') }}"
-                   class="sidebar-link {{ is_current_url('admin.users') ? 'active' : '' }}">
-                    <i class="fas fa-users sidebar-icon"></i>
-                    Users
-                </a>
-                <a href="{{ url_for('admin.settings') }}"
-                   class="sidebar-link {{ is_current_url('admin.settings') ? 'active' : '' }}">
-                    <i class="fas fa-cog sidebar-icon"></i>
-                    Settings
-                </a>
-                <a href="{{ url_for('admin.logout') }}"
+            
+            <nav class="flex-1 overflow-y-auto">
+                <div class="px-4 py-4 space-y-2">
+                    <a href="{{ url_for('admin.dashboard') }}" 
+                       class="sidebar-link {{ is_current_url('admin.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-home sidebar-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    
+                    <a href="{{ url_for('admin.users') }}" 
+                       class="sidebar-link {{ is_current_url('admin.users') ? 'active' : '' }}">
+                        <i class="fas fa-users sidebar-icon"></i>
+                        <span>Users</span>
+                    </a>
+                    
+                    <a href="{{ url_for('admin.posts') }}" 
+                       class="sidebar-link {{ is_current_url('admin.posts') ? 'active' : '' }}">
+                        <i class="fas fa-file-alt sidebar-icon"></i>
+                        <span>Posts</span>
+                    </a>
+                    
+                    <a href="{{ url_for('admin.settings') }}" 
+                       class="sidebar-link {{ is_current_url('admin.settings') ? 'active' : '' }}">
+                        <i class="fas fa-cog sidebar-icon"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="p-4 border-t border-gray-700">
+                <a href="{{ url_for('admin.logout') }}" 
                    class="sidebar-link">
                     <i class="fas fa-sign-out-alt sidebar-icon"></i>
-                    Logout
+                    <span>Logout</span>
                 </a>
-                <a href="{{ url_for('admin.documents') }}"
-                   class="sidebar-link {{ is_current_url('admin.documents') ? 'active' : '' }}">
-                    <i class="fas fa-file-alt sidebar-icon"></i>
-                    Documents
-                </a>
-            </nav>
-        </div>
+            </div>
+        </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Navigation -->
-            <header class="bg-white shadow">
+        <main class="flex-1 ml-64 p-8">
+            <!-- Header -->
+            <header class="bg-white shadow rounded-lg mb-6">
                 <div class="px-6 py-4">
-                    <h2 class="text-xl font-semibold text-gray-800">{{ title }}</h2>
+                    <h1 class="text-2xl font-semibold text-gray-800">{{ title }}</h1>
                 </div>
             </header>
 
-            <!-- Main Content Area -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+            <!-- Content -->
+            <div class="bg-white shadow rounded-lg">
                 {% block content %}{% endblock %}
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
     <!-- Scripts -->

@@ -54,16 +54,16 @@ Formát je založený na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
   - Pridaný balík pragmarx/google2fa pre 2FA funkcionalitu
 
 ### Changed
-- Reorganizácia admin routes do logických skupín
-- Vylepšenie štruktúry kontrolérov
-- Optimalizácia autentifikačného systému
+- Kompletne prepracovaný admin interface
+  - Zjednotený dizajn všetkých admin stránok
+  - Vylepšená navigácia s fixným siderbarom
+  - Konzistentné štýlovanie pomocou Tailwind CSS
+  - Responzívny layout pre všetky zariadenia
+  - Vylepšené zobrazenie štatistík na dashboarde
 
-### Security
-- Zabezpečenie routes pre správu používateľov
-- Implementácia autorizácie pre admin akcie
-- Validácia používateľských vstupov
-- Vylepšené zabezpečenie sessions
-- Pridaná druhá úroveň autentifikácie (2FA)
+### Fixed
+- Opravené zobrazovanie sidebar linkov v admin rozhraní
+- Zjednotené štýlovanie medzi rôznymi sekciami admin panelu
 
 ## [0.1.0] - 2024-01-15
 
