@@ -2,12 +2,12 @@
 
 {% block content %}
 <div class="p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Stats Cards -->
-        <div class="bg-white rounded-lg shadow p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- Users Stats -->
+        <div class="stats-card">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-blue-100 text-blue-500">
-                    <i class="fas fa-users text-xl"></i>
+                <div class="stats-icon bg-blue-100 text-blue-500">
+                    <i class="fas fa-users"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-gray-500 text-sm">Total Users</p>
@@ -16,10 +16,11 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
+        <!-- Posts Stats -->
+        <div class="stats-card">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-500">
-                    <i class="fas fa-file-alt text-xl"></i>
+                <div class="stats-icon bg-green-100 text-green-500">
+                    <i class="fas fa-file-alt"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-gray-500 text-sm">Total Posts</p>
@@ -28,16 +29,63 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
+        <!-- Comments Stats -->
+        <div class="stats-card">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-purple-100 text-purple-500">
-                    <i class="fas fa-comments text-xl"></i>
+                <div class="stats-icon bg-purple-100 text-purple-500">
+                    <i class="fas fa-comments"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-gray-500 text-sm">Comments</p>
                     <p class="text-2xl font-semibold">{{ stats.comments ?? 0 }}</p>
                 </div>
             </div>
+        </div>
+
+        <!-- Active Users -->
+        <div class="stats-card">
+            <div class="flex items-center">
+                <div class="stats-icon bg-yellow-100 text-yellow-500">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-gray-500 text-sm">Active Users</p>
+                    <p class="text-2xl font-semibold">{{ stats.active_users ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
+        </div>
+        <div class="p-6">
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th class="table-header">User</th>
+                        <th class="table-header">Action</th>
+                        <th class="table-header">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if activities is empty %}
+                        <tr>
+                            <td colspan="3" class="table-cell text-center text-gray-500">No recent activity</td>
+                        </tr>
+                    {% else %}
+                        {% for activity in activities %}
+                        <tr>
+                            <td class="table-cell">{{ activity.user }}</td>
+                            <td class="table-cell">{{ activity.action }}</td>
+                            <td class="table-cell">{{ activity.date }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -1,10 +1,8 @@
 <?php
 
 use App\Admin\Controllers\AdminController;
-use App\Admin\Controllers\TwoFactorAuthController;
-use App\Admin\Controllers\AuditLogController;
-use App\Admin\Controllers\IpWhitelistController;
-use App\Admin\Controllers\DocumentController;
+use App\Admin\Controllers\PostController;
+use App\Admin\Controllers\UserController;
 
 $app->group('/dashboard', function ($group) use ($app) {
     // Public routes
@@ -14,27 +12,28 @@ $app->group('/dashboard', function ($group) use ($app) {
 
     // Protected routes
     $group->group('', function ($group) {
+        // Dashboard
         $group->get('', [AdminController::class, 'dashboard'])->setName('admin.dashboard');
         
         // Users routes
-        $group->get('/users', [AdminController::class, 'users'])
-            ->setName('admin.users');
-        $group->get('/users/create', [AdminController::class, 'createUser'])
-            ->setName('admin.users.create');
-        $group->post('/users', [AdminController::class, 'storeUser'])
-            ->setName('admin.users.store');
-        $group->get('/users/{id}/edit', [AdminController::class, 'editUser'])
-            ->setName('admin.users.edit');
-        $group->post('/users/{id}', [AdminController::class, 'updateUser'])
-            ->setName('admin.users.update');
-        $group->get('/users/{id}/delete', [AdminController::class, 'deleteUser'])
-            ->setName('admin.users.delete');
+        $group->get('/users', [AdminController::class, 'users'])->setName('admin.users');
+        $group->get('/users/create', [AdminController::class, 'createUser'])->setName('admin.users.create');
+        $group->post('/users', [AdminController::class, 'storeUser'])->setName('admin.users.store');
+        $group->get('/users/{id}/edit', [AdminController::class, 'editUser'])->setName('admin.users.edit');
+        $group->post('/users/{id}', [AdminController::class, 'updateUser'])->setName('admin.users.update');
+        $group->get('/users/{id}/delete', [AdminController::class, 'deleteUser'])->setName('admin.users.delete');
         
-        // Settings routes
-        $group->get('/settings', [AdminController::class, 'settings'])
-            ->setName('admin.settings');
-        $group->post('/settings', [AdminController::class, 'settings'])
-            ->setName('admin.settings.update');
+        // Posts routes
+        $group->get('/posts', [PostController::class, 'index'])->setName('admin.posts');
+        $group->get('/posts/create', [PostController::class, 'create'])->setName('admin.posts.create');
+        $group->post('/posts', [PostController::class, 'store'])->setName('admin.posts.store');
+        $group->get('/posts/{id}', [PostController::class, 'edit'])->setName('admin.posts.edit');
+        $group->put('/posts/{id}', [PostController::class, 'update'])->setName('admin.posts.update');
+        $group->delete('/posts/{id}', [PostController::class, 'delete'])->setName('admin.posts.delete');
+        
+        // Settings route
+        $group->get('/settings', [AdminController::class, 'settings'])->setName('admin.settings');
+        
     })->add($app->getContainer()->get('admin_auth_middleware'));
 });
 
