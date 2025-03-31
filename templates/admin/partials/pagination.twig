@@ -1,0 +1,53 @@
+{% if pagination.lastPage > 1 %}
+    <div class="bg-white dark:bg-dark-bg-secondary px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+        <div class="flex-1 flex justify-between sm:hidden">
+            {% if pagination.currentPage > 1 %}
+                <a href="?page={{ pagination.currentPage - 1 }}" 
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-gray-700">
+                    Predchádzajúca
+                </a>
+            {% endif %}
+            
+            {% if pagination.currentPage < pagination.lastPage %}
+                <a href="?page={{ pagination.currentPage + 1 }}" 
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-gray-700">
+                    Nasledujúca
+                </a>
+            {% endif %}
+        </div>
+        
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    Zobrazujem
+                    <span class="font-medium">{{ pagination.from }}</span>
+                    až
+                    <span class="font-medium">{{ pagination.to }}</span>
+                    z
+                    <span class="font-medium">{{ pagination.total }}</span>
+                    výsledkov
+                </p>
+            </div>
+            
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {% if pagination.currentPage > 1 %}
+                        <a href="?page={{ pagination.currentPage - 1 }}" 
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-bg-secondary text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <span class="sr-only">Predchádzajúca</span>
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    {% endif %}
+                    
+                    {% for i in 1..pagination.lastPage %}
+                        {% if i == pagination.currentPage %}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-blue-50 dark:bg-blue-900 text-sm font-medium text-blue-600 dark:text-blue-200">
+                                {{ i }}
+                            </span>
+                        {% else %}
+                            <a href="?page={{ i }}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-bg-secondary text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                {{ i }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}

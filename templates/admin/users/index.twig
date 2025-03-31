@@ -1,67 +1,206 @@
-{% extends "admin/layout.twig" %}
+{% extends "admin/layouts/base.twig" %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Users Management</h1>
-        <a href="{{ url_for('admin.users.create') }}" 
-           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Add New User
-        </a>
-    </div>
+    <div class="space-y-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold">Users Management</h2>
+            <a href="{{ url_for('admin.users.create') }}" class="btn-primary">
+                <i class="fas fa-plus mr-2"></i>
+                Add New User
+            </a>
+        </div>
 
-    <div class="bg-white shadow-md rounded my-6">
-        <table class="min-w-full">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="py-3 px-6 text-left">Name</th>
-                    <th class="py-3 px-6 text-left">Email</th>
-                    <th class="py-3 px-6 text-center">Admin</th>
-                    <th class="py-3 px-6 text-center">Verified</th>
-                    <th class="py-3 px-6 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="py-4 px-6">{{ user.name }}</td>
-                    <td class="py-4 px-6">{{ user.email }}</td>
-                    <td class="py-4 px-6 text-center">
-                        {% if user.is_admin %}
-                            <span class="text-green-600">✓</span>
-                        {% endif %}
-                    </td>
-                    <td class="py-4 px-6 text-center">
-                        {% if user.email_verified_at %}
-                            <span class="text-green-600">✓</span>
-                        {% endif %}
-                    </td>
-                    <td class="py-4 px-6 text-center">
-                        <a href="{{ url_for('admin.users.edit', {'id': user.id}) }}" 
-                           class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                        <a href="{{ url_for('admin.users.delete', {'id': user.id}) }}" 
-                           class="text-red-600 hover:text-red-900"
-                           onclick="return confirm('Are you sure?')">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <!-- Filters -->
+        <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow p-4">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Search</label>
+                    <input type="text" name="search" value="{{ query.search }}" 
+                           class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Role</label>
+                    <select name="role" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                        <option value="">All Roles</option>
+                        <option value="admin" {{ query.role == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="user" {{ query.role == 'user' ? 'selected' : '' }}>User</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Status</label>
+                    <select name="status" class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                        <option value="">All Status</option>
+                        <option value="active" {{ query.status == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ query.status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+                <div class="md:col-span-3 flex justify-end">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-search mr-2"></i>
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
 
-    {# Pagination #}
-    <div class="mt-4">
+        <!-- Users Table -->
+        <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead>
+                    <tr>
+                        <th class="table-header">User</th>
+                        <th class="table-header">Role</th>
+                        <th class="table-header">Status</th>
+                        <th class="table-header">2FA</th>
+                        <th class="table-header">Last Login</th>
+                        <th class="table-header">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for user in users %}
+                        <tr>
+                            <td class="table-cell">
+                                <div class="flex items-center">
+                                    <img src="{{ user.getAvatarUrl() }}" 
+                                         alt="{{ user.name }}" 
+                                         class="h-10 w-10 rounded-full mr-3">
+                                    <div>
+                                        <div class="font-medium">{{ user.name }}</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="table-cell">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                    {{ user.is_admin ? 
+                                        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 
+                                        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200' 
+                                    }}">
+                                    {{ user.is_admin ? 'Admin' : 'User' }}
+                                </span>
+                            </td>
+                            <td class="table-cell">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                    {{ user.is_active ? 
+                                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                                        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
+                                    }}">
+                                    {{ user.is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="table-cell">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                    {{ user.isTwoFactorEnabled() ? 
+                                        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
+                                        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200' 
+                                    }}">
+                                    {{ user.isTwoFactorEnabled() ? 'Enabled' : 'Disabled' }}
+                                </span>
+                            </td>
+                            <td class="table-cell">
+                                {% if user.last_login_at %}
+                                    <div class="text-sm">
+                                        {{ user.last_login_at|date('Y-m-d H:i') }}
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ user.last_login_ip }}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-500 dark:text-gray-400">Never</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-cell">
+                                <div class="flex space-x-2">
+                                    <a href="{{ url_for('admin.users.edit', {'id': user.id}) }}" 
+                                       class="action-link">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if user.id != session.user_id %}
+                                        <form method="POST" 
+                                              action="{{ url_for('admin.users.toggle-status', {'id': user.id}) }}"
+                                              class="inline">
+                                            <button type="submit" class="action-link">
+                                                <i class="fas {{ user.is_active ? 'fa-ban' : 'fa-check' }}"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" 
+                                              action="{{ url_for('admin.users.delete', {'id': user.id}) }}"
+                                              class="inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                            <button type="submit" class="danger-link">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
         {% if users.hasPages() %}
-            <div class="flex justify-center space-x-4">
-                {% if users.previousPageUrl() %}
-                    <a href="{{ users.previousPageUrl() }}" class="px-4 py-2 bg-gray-200 rounded">Previous</a>
-                {% endif %}
-                
-                {% if users.nextPageUrl() %}
-                    <a href="{{ users.nextPageUrl() }}" class="px-4 py-2 bg-gray-200 rounded">Next</a>
-                {% endif %}
+            <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow px-4 py-3 flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if users.previousPageUrl() %}
+                        <a href="{{ users.previousPageUrl() }}" class="btn-primary">Previous</a>
+                    {% endif %}
+                    {% if users.nextPageUrl() %}
+                        <a href="{{ users.nextPageUrl() }}" class="btn-primary">Next</a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Showing
+                            <span class="font-medium">{{ users.firstItem() }}</span>
+                            to
+                            <span class="font-medium">{{ users.lastItem() }}</span>
+                            of
+                            <span class="font-medium">{{ users.total() }}</span>
+                            results
+                        </p>
+                    </div>
+                    <div>
+                        {{ users.links()|raw }}
+                    </div>
+                </div>
             </div>
         {% endif %}
     </div>
-</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Delete user handling
+    function deleteUser(userId, userName) {
+        const modal = document.querySelector('#deleteModal').__x.$data;
+        modal.userId = userId;
+        modal.userName = userName;
+        modal.show = true;
+    }
+
+    function confirmDelete() {
+        const modal = document.querySelector('#deleteModal').__x.$data;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("admin.users.delete", {"id": "USERID"}) }}'.replace('USERID', modal.userId);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // Toggle user status
+    function toggleUserStatus(userId, action) {
+        if (confirm(`Are you sure you want to ${action} this user?`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url_for("admin.users.toggle-status", {"id": "USERID"}) }}'.replace('USERID', userId);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
 {% endblock %}

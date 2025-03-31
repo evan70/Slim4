@@ -21,17 +21,34 @@ class AdminController
     {
         if ($request->getMethod() === 'POST') {
             $data = $request->getParsedBody();
+            
+            error_log('=== Login Attempt Debug ===');
+            error_log('Attempting login for email: ' . ($data['email'] ?? 'not set'));
+            
             $user = User::where('email', $data['email'])->first();
-
-            if ($user && password_verify($data['password'], $user->password)) {
-                $_SESSION['admin'] = $user->id;
-                return $response
-                    ->withHeader('Location', '/dashboard')
-                    ->withStatus(302);
+            
+            if ($user) {
+                error_log('User found with ID: ' . $user->id);
+                error_log('Stored password hash: ' . $user->password);
+                error_log('Input password (first 5 chars): ' . substr($data['password'], 0, 5));
+                
+                $verified = password_verify($data['password'], $user->password);
+                error_log('Password verification result: ' . ($verified ? 'SUCCESS' : 'FAILED'));
+                
+                if ($verified) {
+                    error_log('Login successful - setting session');
+                    $_SESSION['admin'] = $user->id;
+                    return $response
+                        ->withHeader('Location', '/dashboard')
+                        ->withStatus(302);
+                }
+            } else {
+                error_log('No user found with email: ' . $data['email']);
             }
 
             return $this->view->render($response, 'admin/login.twig', [
-                'error' => 'Invalid credentials'
+                'error' => 'Invalid credentials',
+                'email' => $data['email']
             ]);
         }
 
@@ -215,6 +232,55 @@ class AdminController
 
         return $this->view->render($response, 'admin/settings.twig', [
             'settings' => $settings
+        ]);
+    }
+
+    public function profile(Request $request, Response $response): Response
+    {
+        return $this->view->render($response, 'admin/profile.twig', [
+            'title' => 'My Profile'
+        ]);
+    }
+
+    public function getRecentActivity(Request $request, Response $response): Response
+    {
+        // Example activity data - replace with your actual data retrieval logic
+        $activities = [
+            [
+                'id' => 1,
+                'icon' => 'fas fa-user',
+                'iconClass' => 'bg-blue-100 text-blue-500',
+                'description' => 'New user registered',
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+                'user' => [
+                    'name' => 'John Doe',
+                    'avatar' => 'https://ui-avatars.com/api/?name=John+Doe'
+                ]
+            ],
+            [
+                'id' => 2,
+                'icon' => 'fas fa-file',
+                'iconClass' => 'bg-green-100 text-green-500',
+                'description' => 'New post created',
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+                'user' => [
+                    'name' => 'Jane Smith',
+                    'avatar' => 'https://ui-avatars.com/api/?name=Jane+Smith'
+                ]
+            ]
+        ];
+
+        $response->getBody()->write(json_encode([
+            'activities' => $activities
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public function help(Request $request, Response $response): Response
+    {
+        return $this->view->render($response, 'admin/help.twig', [
+            'title' => 'Help & Documentation'
         ]);
     }
 }

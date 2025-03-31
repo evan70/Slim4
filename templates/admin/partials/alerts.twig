@@ -1,0 +1,47 @@
+{% if flash %}
+    <div x-data="{ show: true }" 
+         x-show="show" 
+         x-transition:enter="transform ease-out duration-300 transition"
+         x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+         x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="mb-6">
+        {% for type, messages in flash %}
+            {% set alertClass = {
+                'success': 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200',
+                'error': 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200',
+                'warning': 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200',
+                'info': 'bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+            } %}
+            
+            {% set iconClass = {
+                'success': 'text-green-400 dark:text-green-300',
+                'error': 'text-red-400 dark:text-red-300',
+                'warning': 'text-yellow-400 dark:text-yellow-300',
+                'info': 'text-blue-400 dark:text-blue-300'
+            } %}
+
+            <div class="rounded-md p-4 {{ alertClass[type] }}">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-{{ type == 'error' ? 'times' : (type == 'warning' ? 'exclamation' : 'check') }}-circle {{ iconClass[type] }}"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm">{{ messages|join(', ') }}</p>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <div class="-mx-1.5 -my-1.5">
+                            <button x-on:click="show = false" 
+                                    class="inline-flex rounded-md p-1.5 {{ alertClass[type] }} hover:bg-opacity-20 focus:outline-none">
+                                <span class="sr-only">Dismiss</span>
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

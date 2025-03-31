@@ -1,28 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light" x-data="{ darkMode: localStorage.getItem('darkMode') === 'dark' }"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val ? 'dark' : 'light'))"
+      :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - {{ title }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            'bg-primary': '#1a1a1a',
+                            'bg-secondary': '#2d2d2d',
+                            'text-primary': '#ffffff',
+                            'text-secondary': '#a0aec0'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwind">
+        @layer components {
+            .dark .dark-hover {
+                @apply hover:bg-gray-700;
+            }
+            .sidebar-link {
+                @apply flex items-center px-6 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 w-full;
+            }
+            .sidebar-link.active {
+                @apply bg-gray-900 text-white;
+            }
+            .sidebar-icon {
+                @apply w-5 h-5 mr-3;
+            }
+            .stats-card {
+                @apply bg-white dark:bg-dark-bg-secondary rounded-lg shadow p-6;
+            }
+            .stats-icon {
+                @apply p-3 rounded-full text-xl;
+            }
+            .btn-primary {
+                @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg inline-flex items-center;
+            }
+            .table-header {
+                @apply text-left py-3 px-4 bg-gray-50 dark:bg-gray-800 border-b font-medium text-gray-600 dark:text-gray-300;
+            }
+            .table-cell {
+                @apply py-3 px-4 border-b border-gray-100 dark:border-gray-700;
+            }
+            /* Add these new link styles */
+            .content-link {
+                @apply text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline;
+            }
+            .action-link {
+                @apply text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium;
+            }
+            .danger-link {
+                @apply text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium;
+            }
+        }
+    </style>
+    {% block styles %}{% endblock %}
 </head>
-<body class="bg-gray-100">
-    <div class="flex">
+<body class="bg-gray-100 dark:bg-dark-bg-primary dark:text-dark-text-primary transition-colors duration-200">
+    <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <div class="w-64 h-screen bg-gray-800">
-            <div class="flex items-center justify-center h-16 bg-gray-900">
+        <aside class="bg-gray-800 dark:bg-dark-bg-secondary w-64 flex flex-col fixed h-full">
+            <div class="flex items-center justify-center h-16 bg-gray-900 dark:bg-dark-bg-primary">
                 <span class="text-white text-xl font-semibold">Admin Panel</span>
             </div>
-            <nav class="mt-4">
-                <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700">Dashboard</a>
-                <a href="{{ url_for('admin.users') }}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700">Users</a>
+            
+            <nav class="flex-1 overflow-y-auto py-4">
+                <div class="flex flex-col space-y-1">
+                    <a href="{{ url_for('admin.dashboard') }}" 
+                       class="sidebar-link {{ is_current_url('admin.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-home sidebar-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    
+                    <a href="{{ url_for('admin.users') }}" 
+                       class="sidebar-link {{ is_current_url('admin.users') ? 'active' : '' }}">
+                        <i class="fas fa-users sidebar-icon"></i>
+                        <span>Users</span>
+                    </a>
+                    
+                    <a href="{{ url_for('admin.posts') }}" 
+                       class="sidebar-link {{ is_current_url('admin.posts') ? 'active' : '' }}">
+                        <i class="fas fa-file-alt sidebar-icon"></i>
+                        <span>Posts</span>
+                    </a>
+                    
+                    <a href="{{ url_for('admin.settings') }}" 
+                       class="sidebar-link {{ is_current_url('admin.settings') ? 'active' : '' }}">
+                        <i class="fas fa-cog sidebar-icon"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
             </nav>
-        </div>
-        
-        <!-- Content -->
-        <div class="flex-1 p-8">
-            {% block content %}{% endblock %}
-        </div>
+            
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex flex-col space-y-1">
+                    <!-- Dark Mode Toggle -->
+                    <button x-on:click="darkMode = !darkMode" 
+                            class="sidebar-link mb-2 w-full">
+                        <i class="fas fa-moon dark:hidden sidebar-icon"></i>
+                        <i class="fas fa-sun hidden dark:inline sidebar-icon"></i>
+                        <span>Toggle Theme</span>
+                    </button>
+                    
+                    <a href="{{ url_for('admin.logout') }}" 
+                       class="sidebar-link text-red-400 hover:text-red-300 w-full">
+                        <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8">
+            <!-- Header -->
+            <header class="bg-white dark:bg-dark-bg-secondary shadow rounded-lg mb-6">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ title }}</h1>
+                    {% block header_actions %}{% endblock %}
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="bg-white dark:bg-dark-bg-secondary shadow rounded-lg">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
+
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -81,7 +81,10 @@ class AdminAuthMiddleware
 
     private function isTwoFactorEnabled(): bool
     {
-        return $_ENV['ADMIN_2FA_ENABLED'] ?? false;
+        // Dočasne vypneme 2FA pre prvé prihlásenie
+        return false;
+        // Pôvodný kód:
+        // return $_ENV['ADMIN_2FA_ENABLED'] ?? false;
     }
 
     private function isTwoFactorPage(): bool

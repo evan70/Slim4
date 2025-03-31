@@ -3,6 +3,7 @@
 use App\Admin\Controllers\AdminController;
 use App\Admin\Controllers\PostController;
 use App\Admin\Controllers\UserController;
+use App\Admin\Middleware\AdminAuthMiddleware;
 
 $app->group('/dashboard', function ($group) use ($app) {
     // Public routes
@@ -33,6 +34,16 @@ $app->group('/dashboard', function ($group) use ($app) {
         
         // Settings route
         $group->get('/settings', [AdminController::class, 'settings'])->setName('admin.settings');
+        
+        // Profile route
+        $group->get('/profile', [AdminController::class, 'profile'])->setName('admin.profile');
+        
+        // API route for recent activity
+        $group->get('/api/recent-activity', [AdminController::class, 'getRecentActivity'])
+            ->setName('admin.api.recent_activity');
+        
+        // Help route
+        $group->get('/help', [AdminController::class, 'help'])->setName('admin.help');
         
     })->add($app->getContainer()->get('admin_auth_middleware'));
 });
@@ -65,3 +76,14 @@ $app->group('/admin/documents', function ($group) {
     $group->post('/preview', [DocumentController::class, 'preview'])
         ->setName('admin.documents.preview');
 })->add($app->getContainer()->get('admin_auth_middleware'));
+
+// User management routes
+$app->group('/admin/users', function ($group) {
+    $group->get('', [UserController::class, 'index'])->setName('admin.users.index');
+    $group->get('/create', [UserController::class, 'create'])->setName('admin.users.create');
+    $group->post('/store', [UserController::class, 'store'])->setName('admin.users.store');
+    $group->get('/edit/{id}', [UserController::class, 'edit'])->setName('admin.users.edit');
+    $group->post('/update/{id}', [UserController::class, 'update'])->setName('admin.users.update');
+    $group->post('/delete/{id}', [UserController::class, 'delete'])->setName('admin.users.delete');
+    $group->post('/toggle-status/{id}', [UserController::class, 'toggleStatus'])->setName('admin.users.toggle-status');
+})->add(AdminAuthMiddleware::class);

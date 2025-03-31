@@ -1,0 +1,15 @@
+{% extends "admin/layouts/base.twig" %}
+
+{% set breadcrumbs = [
+    {'title': 'Dashboard', 'url': url_for('admin.dashboard')},
+    {'title': 'My Profile'}
+] %}
+
+{% block content %}
+    <div class="bg-white dark:bg-dark-bg-secondary shadow rounded-lg">
+        <div class="p-6">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Profile Settings</h2>
+            <!-- Add your profile form and content here -->
+        </div>
+    </div>
+{% endblock %}

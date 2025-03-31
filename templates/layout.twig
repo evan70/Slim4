@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en" class="light" x-data="{ darkMode: localStorage.getItem('darkMode') === 'dark' }"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val ? 'dark' : 'light'))"
+      :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ app_name|default('Documentation') }}</title>
+    <title>{{ title|default(app_name|default('Documentation')) }}</title>
     
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script>
-        // Tailwind konfigurácia
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -27,119 +30,12 @@
                 }
             }
         }
-
-        // Dark mode toggle funkcia
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            const isDark = html.classList.toggle('dark');
-            localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
-        }
-
-        // Načítanie user preferencie
-        if (localStorage.getItem('darkMode') === 'dark' || 
-            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
     </script>
-    
-    <style type="text/tailwind">
-        @layer components {
-            .dark .dark-hover {
-                @apply hover:bg-gray-700;
-            }
-        }
-    </style>
     
     {% block styles %}{% endblock %}
 </head>
 <body class="bg-gray-100 dark:bg-dark-bg-primary dark:text-dark-text-primary transition-colors duration-200">
-    <!-- Navigation -->
-    <nav class="bg-white dark:bg-dark-bg-secondary shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <!-- Logo -->
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ url_for('home') }}" class="text-xl font-bold text-gray-800 dark:text-white">
-                            <i class="fas fa-book mr-2"></i>
-                            Docs
-                        </a>
-                    </div>
-
-                    <!-- Navigation Links -->
-                    <div class="hidden md:ml-6 md:flex md:space-x-8">
-                        <a href="{{ url_for('home') }}" 
-                           class="inline-flex items-center px-1 pt-1 border-b-2 
-                           {{ is_current_url('home') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200' }}">
-                            <i class="fas fa-home mr-2"></i>
-                            Home
-                        </a>
-                        <a href="{{ url_for('documents.index') }}"
-                           class="inline-flex items-center px-1 pt-1 border-b-2
-                           {{ is_current_url('documents.index') ? 'border-blue-500 text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200' }}">
-                            <i class="fas fa-file-alt mr-2"></i>
-                            Documents
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Dark Mode Toggle -->
-                <div class="flex items-center">
-                    <button onclick="toggleDarkMode()" 
-                            class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:inline"></i>
-                    </button>
-                </div>
-
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button type="button" 
-                            class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-                            onclick="toggleMobileMenu()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile menu -->
-        <div class="hidden md:hidden" id="mobile-menu">
-            <div class="pt-2 pb-3 space-y-1">
-                <a href="{{ url_for('home') }}" 
-                   class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium
-                   {{ is_current_url('home') ? 'border-blue-500 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                    <i class="fas fa-home mr-2"></i>
-                    Home
-                </a>
-                <a href="{{ url_for('documents.index') }}"
-                   class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium
-                   {{ is_current_url('documents.index') ? 'border-blue-500 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                    <i class="fas fa-file-alt mr-2"></i>
-                    Documents
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Content -->
-    {% block content %}{% endblock %}
-
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-dark-bg-secondary shadow-lg mt-12">
-        <div class="max-w-7xl mx-auto py-6 px-4">
-            <div class="text-center text-gray-500 dark:text-gray-400">
-                &copy; {{ "now"|date("Y") }} Documentation. All rights reserved.
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript for mobile menu -->
-    <script>
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenu.classList.toggle('hidden');
-        }
-    </script>
+    {% block body %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 </html>

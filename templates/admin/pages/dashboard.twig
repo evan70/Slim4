@@ -1,0 +1,135 @@
+{% extends "admin/layouts/base.twig" %}
+
+{% block content %}
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Users Stats -->
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400">Celkom užívateľov</p>
+                    <h3 class="text-2xl font-bold mt-1">{{ stats.users_count }}</h3>
+                </div>
+                <div class="stats-icon bg-blue-100 dark:bg-blue-900 text-blue-500 dark:text-blue-400">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-green-500">
+                    <i class="fas fa-arrow-up"></i> {{ stats.users_growth }}%
+                </span>
+                <span class="text-gray-500 dark:text-gray-400 ml-2">od minulého mesiaca</span>
+            </div>
+        </div>
+
+        <!-- Posts Stats -->
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400">Celkom príspevkov</p>
+                    <h3 class="text-2xl font-bold mt-1">{{ stats.posts_count }}</h3>
+                </div>
+                <div class="stats-icon bg-green-100 dark:bg-green-900 text-green-500 dark:text-green-400">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-green-500">
+                    <i class="fas fa-arrow-up"></i> {{ stats.posts_growth }}%
+                </span>
+                <span class="text-gray-500 dark:text-gray-400 ml-2">od minulého mesiaca</span>
+            </div>
+        </div>
+
+        <!-- Active Users -->
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400">Aktívni užívatelia</p>
+                    <h3 class="text-2xl font-bold mt-1">{{ stats.active_users }}</h3>
+                </div>
+                <div class="stats-icon bg-purple-100 dark:bg-purple-900 text-purple-500 dark:text-purple-400">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-gray-500 dark:text-gray-400">Posledných 24 hodín</span>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="stats-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 dark:text-gray-400">Systémový stav</p>
+                    <h3 class="text-2xl font-bold mt-1">{{ stats.system_status }}</h3>
+                </div>
+                <div class="stats-icon bg-yellow-100 dark:bg-yellow-900 text-yellow-500 dark:text-yellow-400">
+                    <i class="fas fa-server"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="text-gray-500 dark:text-gray-400">
+                    CPU: {{ stats.cpu_usage }}% | RAM: {{ stats.ram_usage }}%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Activity -->
+        <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Nedávna aktivita</h2>
+                <div class="space-y-4">
+                    {% for activity in recent_activities %}
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <img class="h-8 w-8 rounded-full" src="{{ activity.user.avatar }}" alt="">
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-800 dark:text-white">
+                                    <span class="font-medium">{{ activity.user.name }}</span>
+                                    {{ activity.description }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ activity.created_at|date("d.m.Y H:i") }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Rýchle akcie</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="{{ url_for('admin.users.create') }}" 
+                       class="btn-primary">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Nový užívateľ
+                    </a>
+                    <a href="{{ url_for('admin.posts.create') }}" 
+                       class="btn-primary">
+                        <i class="fas fa-file-plus mr-2"></i>
+                        Nový príspevok
+                    </a>
+                    <a href="{{ url_for('admin.settings') }}" 
+                       class="btn-primary">
+                        <i class="fas fa-cog mr-2"></i>
+                        Nastavenia
+                    </a>
+                    <a href="{{ url_for('admin.reports') }}" 
+                       class="btn-primary">
+                        <i class="fas fa-chart-bar mr-2"></i>
+                        Reporty
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -26,13 +26,21 @@ class SecurityMiddleware implements MiddlewareInterface
     {
         $ip = $request->getServerParams()['REMOTE_ADDR'];
         $path = $request->getUri()->getPath();
+        $host = $request->getHeaderLine('Host');
+
+        error_log('=== Security Middleware Debug ===');
+        error_log('Request IP: ' . $ip);
+        error_log('Request Path: ' . $path);
+        error_log('Request Host: ' . $host);
 
         // IP Whitelisting pre admin rozhranie
         if (str_starts_with($path, '/admin')) {
-            if (!$this->isIpWhitelisted($ip)) {
-                $this->auditService->log('ip_whitelist_blocked', null, null, ['ip' => $ip]);
+            if (!$this->isIpWhitelisted($ip) && !$this->isIpWhitelisted($host)) {
+                error_log('IP/Host not whitelisted: ' . $ip . ' / ' . $host);
+                $this->auditService->log('ip_whitelist_blocked', null, null, ['ip' => $ip, 'host' => $host]);
                 return $this->createErrorResponse('IP nie je na whiteliste', 403);
             }
+            error_log('IP/Host is whitelisted');
         }
 
         // Rate Limiting
@@ -47,7 +55,11 @@ class SecurityMiddleware implements MiddlewareInterface
 
     private function isIpWhitelisted(string $ip): bool
     {
+        // Odstránime port ak existuje
+        $ip = explode(':', $ip)[0];
+        
         return IpWhitelist::where('ip_address', $ip)
+            ->orWhere('ip_address', 'localhost')
             ->where(function ($query) {
                 $query->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());

@@ -83,9 +83,13 @@ abstract class TestCase extends BaseTestCase
             $table->string('email')->unique();
             $table->string('password');
             $table->boolean('is_admin')->default(false);
-            $table->string('remember_token')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->string('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('last_login_at')->nullable();
+            $table->string('last_login_ip')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Vytvorenie migrations tabuľky

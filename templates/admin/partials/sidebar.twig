@@ -1,0 +1,82 @@
+<aside class="h-full flex flex-col bg-gray-800 dark:bg-dark-bg-secondary">
+    <!-- Logo section -->
+    <div class="flex-shrink-0 flex items-center justify-center h-16 bg-gray-900 dark:bg-dark-bg-primary">
+        <span class="text-white text-xl font-semibold">Admin Panel</span>
+    </div>
+    
+    <!-- Navigation section -->
+    <div class="flex-1 flex flex-col min-h-0">
+        <nav class="flex-1 px-4 py-4">
+            <ul class="flex flex-col space-y-2">
+                <!-- Dashboard -->
+                <li>
+                    <a href="{{ url_for('admin.dashboard') }}" 
+                       class="sidebar-link {{ is_current_url('admin.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-home sidebar-icon"></i>
+                        <span class="truncate">Dashboard</span>
+                    </a>
+                </li>
+                
+                <!-- Users -->
+                <li>
+                    <a href="{{ url_for('admin.users') }}" 
+                       class="sidebar-link {{ is_current_url('admin.users') ? 'active' : '' }}">
+                        <i class="fas fa-users sidebar-icon"></i>
+                        <span class="truncate">Users</span>
+                    </a>
+                </li>
+                
+                <!-- Posts -->
+                <li>
+                    <a href="{{ url_for('admin.posts') }}" 
+                       class="sidebar-link {{ is_current_url('admin.posts') ? 'active' : '' }}">
+                        <i class="fas fa-file-alt sidebar-icon"></i>
+                        <span class="truncate">Posts</span>
+                    </a>
+                </li>
+                
+                <!-- Documents -->
+                <li>
+                    <a href="{{ url_for('admin.documents') }}" 
+                       class="sidebar-link {{ is_current_url('admin.documents') ? 'active' : '' }}">
+                        <i class="fas fa-folder sidebar-icon"></i>
+                        <span class="truncate">Documents</span>
+                    </a>
+                </li>
+                
+                <!-- Settings -->
+                <li>
+                    <a href="{{ url_for('admin.settings') }}" 
+                       class="sidebar-link {{ is_current_url('admin.settings') ? 'active' : '' }}">
+                        <i class="fas fa-cog sidebar-icon"></i>
+                        <span class="truncate">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Bottom actions section -->
+    <div class="flex-shrink-0 border-t border-gray-700 p-4">
+        <ul class="flex flex-col space-y-2">
+            <!-- Theme toggle -->
+            <li>
+                <button x-on:click="darkMode = !darkMode"
+                        class="sidebar-link w-full">
+                    <i class="fas fa-moon sidebar-icon" x-show="!darkMode"></i>
+                    <i class="fas fa-sun sidebar-icon" x-show="darkMode"></i>
+                    <span class="truncate" x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></span>
+                </button>
+            </li>
+            
+            <!-- Logout button -->
+            <li>
+                <a href="{{ url_for('admin.logout') }}" 
+                   class="sidebar-link text-red-400 hover:text-red-300">
+                    <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                    <span class="truncate">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

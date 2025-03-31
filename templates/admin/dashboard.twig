@@ -1,93 +1,259 @@
-{# {% extends "admin/layouts/base.twig" %} #}
-{% extends "admin/layout.twig" %}
+{% extends "admin/layouts/base.twig" %}
 
 {% block content %}
-<div class="p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <!-- Users Stats -->
-        <div class="stats-card">
-            <div class="flex items-center">
-                <div class="stats-icon bg-blue-100 text-blue-500">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Users</p>
-                    <p class="text-2xl font-semibold">{{ stats.users ?? 0 }}</p>
+<div x-data="dashboard()">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <template x-for="stat in stats" :key="stat.name">
+            <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-6"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform scale-95"
+                 x-transition:enter-end="opacity-100 transform scale-100">
+                <div class="flex items-center">
+                    <div :class="stat.iconClass" class="rounded-full p-3">
+                        <i :class="stat.icon" class="text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400" x-text="stat.name"></p>
+                        <p class="text-2xl font-semibold dark:text-white">
+                            <span x-text="stat.value"></span>
+                            <span x-show="stat.trend" 
+                                  :class="stat.trend > 0 ? 'text-green-500' : 'text-red-500'"
+                                  class="text-sm ml-2">
+                                <i :class="stat.trend > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+                                <span x-text="Math.abs(stat.trend) + '%'"></span>
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
+        </template>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Users Chart -->
+        <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold dark:text-white">User Growth</h3>
+                <div x-data="{ timeframe: '7d' }" class="relative">
+                    <select x-model="timeframe" 
+                            @change="updateUserChart()"
+                            class="form-select bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                        <option value="7d">Last 7 days</option>
+                        <option value="30d">Last 30 days</option>
+                        <option value="90d">Last 90 days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="h-64" x-ref="usersChart"></div>
         </div>
 
-        <!-- Posts Stats -->
-        <div class="stats-card">
-            <div class="flex items-center">
-                <div class="stats-icon bg-green-100 text-green-500">
-                    <i class="fas fa-file-alt"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Total Posts</p>
-                    <p class="text-2xl font-semibold">{{ stats.posts ?? 0 }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Comments Stats -->
-        <div class="stats-card">
-            <div class="flex items-center">
-                <div class="stats-icon bg-purple-100 text-purple-500">
-                    <i class="fas fa-comments"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Comments</p>
-                    <p class="text-2xl font-semibold">{{ stats.comments ?? 0 }}</p>
+        <!-- Activity Chart -->
+        <div class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold dark:text-white">Activity Overview</h3>
+                <div x-data="{ type: 'all' }" class="relative">
+                    <select x-model="type" 
+                            @change="updateActivityChart()"
+                            class="form-select bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                        <option value="all">All Activity</option>
+                        <option value="posts">Posts</option>
+                        <option value="comments">Comments</option>
+                    </select>
                 </div>
             </div>
-        </div>
-
-        <!-- Active Users -->
-        <div class="stats-card">
-            <div class="flex items-center">
-                <div class="stats-icon bg-yellow-100 text-yellow-500">
-                    <i class="fas fa-user-clock"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-gray-500 text-sm">Active Users</p>
-                    <p class="text-2xl font-semibold">{{ stats.active_users ?? 0 }}</p>
-                </div>
-            </div>
+            <div class="h-64" x-ref="activityChart"></div>
         </div>
     </div>
 
     <!-- Recent Activity -->
-    <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800">Recent Activity</h3>
+    <div x-data="dashboard" class="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold dark:text-white">Recent Activity</h3>
+                <button @click="refreshActivity()" 
+                        class="text-blue-500 hover:text-blue-600 dark:text-blue-400">
+                    <i class="fas fa-sync-alt" :class="{ 'fa-spin': loading }"></i>
+                </button>
+            </div>
         </div>
-        <div class="p-6">
-            <table class="min-w-full">
-                <thead>
-                    <tr>
-                        <th class="table-header">User</th>
-                        <th class="table-header">Action</th>
-                        <th class="table-header">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if activities is empty %}
-                        <tr>
-                            <td colspan="3" class="table-cell text-center text-gray-500">No recent activity</td>
-                        </tr>
-                    {% else %}
-                        {% for activity in activities %}
-                        <tr>
-                            <td class="table-cell">{{ activity.user }}</td>
-                            <td class="table-cell">{{ activity.action }}</td>
-                            <td class="table-cell">{{ activity.date }}</td>
-                        </tr>
-                        {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <template x-if="recentActivity.length === 0">
+                <div class="px-6 py-4 text-gray-500 dark:text-gray-400 text-center">
+                    No recent activity
+                </div>
+            </template>
+            <template x-for="activity in recentActivity" :key="activity.id">
+                <div class="px-6 py-4 flex items-center">
+                    <div :class="activity.iconClass" class="rounded-full p-2">
+                        <i :class="activity.icon" class="text-sm"></i>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm text-gray-800 dark:text-white">
+                            <span class="font-medium" x-text="activity.user.name"></span>
+                            <span x-text="activity.description"></span>
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400" x-text="formatDate(activity.timestamp)"></p>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('dashboard', () => ({
+        stats: [
+            {
+                name: 'Total Users',
+                value: {{ stats.users|default(0) }},
+                trend: 12,
+                icon: 'fas fa-users',
+                iconClass: 'bg-blue-100 text-blue-500 dark:bg-blue-900 dark:text-blue-200'
+            },
+            {
+                name: 'Total Posts',
+                value: {{ stats.posts|default(0) }},
+                trend: -5,
+                icon: 'fas fa-file-alt',
+                iconClass: 'bg-green-100 text-green-500 dark:bg-green-900 dark:text-green-200'
+            },
+            {
+                name: 'Comments',
+                value: {{ stats.comments|default(0) }},
+                trend: 8,
+                icon: 'fas fa-comments',
+                iconClass: 'bg-purple-100 text-purple-500 dark:bg-purple-900 dark:text-purple-200'
+            },
+            {
+                name: 'Active Users',
+                value: {{ stats.active_users|default(0) }},
+                trend: 15,
+                icon: 'fas fa-user-clock',
+                iconClass: 'bg-yellow-100 text-yellow-500 dark:bg-yellow-900 dark:text-yellow-200'
+            }
+        ],
+        recentActivity: [],
+        loading: false,
+        usersChart: null,
+        activityChart: null,
+
+        init() {
+            this.initCharts();
+            this.loadRecentActivity();
+        },
+
+        initCharts() {
+            // Initialize charts with Chart.js
+            const darkMode = document.documentElement.classList.contains('dark');
+            const gridColor = darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const textColor = darkMode ? '#a0aec0' : '#4a5568';
+
+            // Users Chart
+            this.usersChart = new Chart(this.$refs.usersChart, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'New Users',
+                        data: [65, 59, 80, 81, 56, 55, 40],
+                        borderColor: '#3b82f6',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: textColor }
+                        }
+                    }
+                }
+            });
+
+            // Activity Chart
+            this.activityChart = new Chart(this.$refs.activityChart, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Activity',
+                        data: [12, 19, 3, 5, 2, 3, 7],
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: textColor }
+                        }
+                    }
+                }
+            });
+        },
+
+        async loadRecentActivity() {
+            this.loading = true;
+            try {
+                const response = await fetch('{{ url_for("admin.api.recent_activity") }}');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                this.recentActivity = data.activities;
+            } catch (error) {
+                console.error('Failed to load recent activity:', error);
+                // Optionally show an error message to the user
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        refreshActivity() {
+            this.loadRecentActivity();
+        },
+
+        updateUserChart() {
+            // Update chart data based on selected timeframe
+        },
+
+        updateActivityChart() {
+            // Update chart data based on selected type
+        },
+
+        formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+    }));
+});
+</script>
+{% endblock %}
 </div>
 {% endblock %}

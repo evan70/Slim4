@@ -52,6 +52,9 @@ Formát je založený na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
   - Konfigurovateľná životnosť session
 - Nové závislosti
   - Pridaný balík pragmarx/google2fa pre 2FA funkcionalitu
+- Nové administračné nástroje
+  - Script na reset hesla (`bin/reset-password.php`)
+  - Script na testovanie hesiel (`bin/test-password.php`)
 
 ### Changed
 - Kompletne prepracovaný admin interface
@@ -64,6 +67,17 @@ Formát je založený na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
 ### Fixed
 - Opravené zobrazovanie sidebar linkov v admin rozhraní
 - Zjednotené štýlovanie medzi rôznymi sekciami admin panelu
+- Opravený problém s nesprávnym hashovaním hesiel pri vytváraní užívateľov
+  - Implementované automatické hashovanie cez User model
+  - Pridané validačné testy pre správne hashovanie hesiel
+  - Aktualizované existujúce záznamy na správny formát hashu
+
+### Security
+- Vylepšené zabezpečenie správy hesiel
+  - Implementovaná kontrola správneho hashovania hesiel
+  - Pridané nástroje na bezpečný reset hesiel
+  - Vylepšené logovanie pokusov o prihlásenie
+  - Štandardizované používanie `password_hash` a `password_verify`
 
 ## [0.1.0] - 2024-01-15
 

@@ -3,6 +3,9 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/bootstrap.php';
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Schema\Blueprint;
+
 // Načítanie všetkých migračných súborov
 $migrationsPath = __DIR__ . '/../database/migrations';
 $migrations = glob($migrationsPath . '/*.php');
@@ -14,20 +17,16 @@ $duplicateChecks = [];
 
 foreach ($migrations as $migration) {
     $filename = basename($migration);
-    
-    // Kontrola správneho formátu názvu (YYYY_MM_DD_HHMMSS_name.php)
-    if (!preg_match('/^\d{4}_\d{2}_\d{2}_\d{6}_.*\.php$/', $filename)) {
+    if (preg_match('/^\d{4}_\d{2}_\d{2}_\d{6}_.*\.php$/', $filename)) {
+        if (in_array($filename, $duplicateChecks)) {
+            $invalidMigrations[] = "Duplicitná migrácia: $filename";
+        } else {
+            $validMigrations[] = $migration;
+            $duplicateChecks[] = $filename;
+        }
+    } else {
         $invalidMigrations[] = $filename;
-        continue;
     }
-    
-    // Kontrola duplicitných názvov (bez timestampu)
-    $name = preg_replace('/^\d{4}_\d{2}_\d{2}_\d{6}_/', '', $filename);
-    if (isset($duplicateChecks[$name])) {
-        throw new Exception("Našla sa duplicitná migrácia: $filename a " . $duplicateChecks[$name]);
-    }
-    $duplicateChecks[$name] = $filename;
-    $validMigrations[] = $migration;
 }
 
 // Výpis chýb ak existujú nesprávne pomenované migrácie
@@ -40,10 +39,8 @@ if (!empty($invalidMigrations)) {
 }
 
 // Vytvorenie tabuľky pre sledovanie migrácií ak neexistuje
-use Illuminate\Database\Capsule\Manager as Capsule;
-
 if (!Capsule::schema()->hasTable('migrations')) {
-    Capsule::schema()->create('migrations', function ($table) {
+    Capsule::schema()->create('migrations', function (Blueprint $table) {
         $table->id();
         $table->string('migration');
         $table->timestamp('executed_at');
@@ -62,19 +59,13 @@ foreach ($validMigrations as $migration) {
             ->exists();
         
         if (!$executed) {
-            // Kontrola či tabuľky už neexistujú
-            $content = file_get_contents($migration);
-            if (preg_match_all('/create\([\'"](\w+)[\'"]/', $content, $matches)) {
-                foreach ($matches[1] as $table) {
-                    if (Capsule::schema()->hasTable($table)) {
-                        throw new Exception("Tabuľka '$table' už existuje");
-                    }
-                }
-            }
+            // Načítanie migračnej triedy
+            $migrationClass = require $migration;
             
             // Spustenie migrácie v transakcii
-            Capsule::connection()->transaction(function() use ($migration, $migrationName) {
-                require $migration;
+            Capsule::connection()->transaction(function() use ($migrationClass, $migrationName) {
+                // Spustenie up() metódy
+                $migrationClass->up();
                 
                 // Zaznamenanie úspešnej migrácie
                 Capsule::table('migrations')->insert([
@@ -88,7 +79,7 @@ foreach ($validMigrations as $migration) {
             echo "Migrácia $migrationName už bola spustená predtým\n";
         }
     } catch (Exception $e) {
-        echo "CHYBA pri migrácii $migrationName: " . $e->getMessage() . "\n";
+        echo "CHYBA pri spustení migrácie $migrationName: " . $e->getMessage() . "\n";
         exit(1);
     }
 }
