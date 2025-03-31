@@ -16,6 +16,7 @@ use App\Services\MarkdownService;
 use App\Controllers\HomeController;
 use App\Controllers\DocumentController;
 use App\Admin\Controllers\DocumentController as AdminDocumentController;
+use App\Admin\Controllers\AdminController;
 
 session_start();
 
@@ -83,6 +84,12 @@ $container->set(AdminDocumentController::class, function (Container $container) 
     return new AdminDocumentController(
         $container->get(Twig::class),
         $container->get(MarkdownService::class)
+    );
+});
+
+$container->set(AdminController::class, function (Container $container) {
+    return new AdminController(
+        $container->get(Twig::class)
     );
 });
 

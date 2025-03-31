@@ -5,7 +5,7 @@ namespace App\Admin\Controllers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\User;
-use App\Models\Setting;
+use Carbon\Carbon;
 use Slim\Views\Twig;
 
 class AdminController
@@ -40,7 +40,25 @@ class AdminController
 
     public function dashboard(Request $request, Response $response): Response
     {
-        return $this->view->render($response, 'admin/dashboard.twig');
+        $stats = [
+            'users' => User::count(),
+            'posts' => 0, // Ak máte Post model: Post::count()
+            'comments' => 0, // Ak máte Comment model: Comment::count()
+            'active_users' => User::where('last_login_at', '>=', Carbon::now()->subDays(7))->count()
+        ];
+
+        $activities = []; // Tu môžete pridať aktivity ak máte Activity/AuditLog model
+        // Príklad:
+        // $activities = AuditLog::with('user')
+        //     ->orderBy('created_at', 'desc')
+        //     ->limit(10)
+        //     ->get();
+
+        return $this->view->render($response, 'admin/dashboard.twig', [
+            'title' => 'Dashboard',
+            'stats' => $stats,
+            'activities' => $activities
+        ]);
     }
 
     public function logout(Request $request, Response $response): Response
